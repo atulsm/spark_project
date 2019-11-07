@@ -1,6 +1,5 @@
 import org.apache.spark._
 
-
 object HdfsTest {
 
   /** Usage: HdfsTest [file] */
@@ -9,7 +8,7 @@ object HdfsTest {
       System.err.println("Usage: HdfsTest <file>")
       System.exit(1)
     }
-    val sparkConf = new SparkConf().setAppName("HdfsTest").set("spark.driver.allowMultipleContexts", "true") 
+    val sparkConf = new SparkConf().setAppName("HdfsTest").set("spark.driver.allowMultipleContexts", "true")
     val sc = new SparkContext(sparkConf)
     val file = sc.textFile(args(0))
     val mapped = file.map(s => s.length).cache()
@@ -17,7 +16,7 @@ object HdfsTest {
       val start = System.currentTimeMillis()
       for (x <- mapped) { x + 2 }
       val end = System.currentTimeMillis()
-      println("Iteration " + iter + " took " + (end-start) + " ms")
+      println("Iteration " + iter + " took " + (end - start) + " ms")
     }
     sc.stop()
   }

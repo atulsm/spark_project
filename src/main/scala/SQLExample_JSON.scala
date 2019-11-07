@@ -11,7 +11,6 @@ object SQLExample_JSON extends App {
     .config("spark.some.config.option", "some-value")
     .getOrCreate()
 
-
   val df = spark.read.json(logFile)
   df.show
 

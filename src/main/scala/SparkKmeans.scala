@@ -60,11 +60,11 @@ object SparkKmeans extends App {
 
   import org.apache.spark.sql.Row
   val dfpen = spark.createDataFrame(pen_raw.map(Row.fromSeq(_)), penschema)
-  
+
   import org.apache.spark.ml.feature.VectorAssembler
   val va = new VectorAssembler().setOutputCol("features")
   va.setInputCols(dfpen.columns.diff(Array("label")))
-  
+
   val penlpoints = va.transform(dfpen).select("features", "label")
 
   val dtsi = new StringIndexer().setInputCol("label").setOutputCol("label-ind")
@@ -87,7 +87,7 @@ object SparkKmeans extends App {
   //67.5102817068467
 
   val kmpredicts = kmmodel.transform(penlpoints)
-  
+
   printContingency(kmpredicts, 0 to 9)
 
   import org.apache.spark.rdd.RDD
@@ -142,10 +142,9 @@ object SparkKmeans extends App {
     rdd.unpersist()
     println("Purity: " + sum.toDouble / rdd.count())
     println("Predicted->original label map: " + labelMap.mapValues(x => x._1))
-    
+
     // Purity: 0.6672125181950509
-// Predicted->original label map: Map(8 -> 8, 2 -> 6, 5 -> 0, 4 -> 1, 7 -> 5, 9 -> 9, 3 -> 4, 6 -> 3, 0 -> 2)
+    // Predicted->original label map: Map(8 -> 8, 2 -> 6, 5 -> 0, 4 -> 1, 7 -> 5, 9 -> 9, 3 -> 4, 6 -> 3, 0 -> 2)
   }
-  
 
 }

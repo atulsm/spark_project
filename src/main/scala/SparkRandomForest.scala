@@ -20,7 +20,7 @@ import org.apache.spark.ml.feature.StringIndexer
 import org.apache.spark.ml.feature.StringIndexerModel
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.mllib.evaluation.MulticlassMetrics
- import org.apache.spark.ml.classification.RandomForestClassifier
+import org.apache.spark.ml.classification.RandomForestClassifier
 object SparkRandomForest extends App {
   val rootLogger = Logger.getLogger("org")
   rootLogger.setLevel(Level.ERROR)
@@ -73,7 +73,6 @@ object SparkRandomForest extends App {
   val pendttrain = pendtsets(0).cache()
   val pendtvalid = pendtsets(1).cache()
 
- 
   val rf = new RandomForestClassifier()
   rf.setMaxDepth(22)
   //rf.setNumTrees(3)
@@ -81,7 +80,7 @@ object SparkRandomForest extends App {
   println(rfmodel)
   val rfpredicts = rfmodel.transform(pendtvalid)
   val rfresrdd = rfpredicts.select("prediction", "label").rdd.map(row => (row.getDouble(0), row.getDouble(1)))
-  
+
   rfresrdd.collect.foreach(println)
   val rfmm = new MulticlassMetrics(rfresrdd)
   println(rfmm.precision)

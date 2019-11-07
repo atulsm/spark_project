@@ -4,8 +4,8 @@ import org.apache.spark.mllib.clustering.{ KMeans, KMeansModel }
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
-import org.apache.spark.mllib.linalg.distributed.{RowMatrix, CoordinateMatrix, BlockMatrix, DistributedMatrix, MatrixEntry}
-import breeze.linalg.{DenseMatrix => BDM,CSCMatrix => BSM,Matrix => BM}
+import org.apache.spark.mllib.linalg.distributed.{ RowMatrix, CoordinateMatrix, BlockMatrix, DistributedMatrix, MatrixEntry }
+import breeze.linalg.{ DenseMatrix => BDM, CSCMatrix => BSM, Matrix => BM }
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
 
@@ -23,11 +23,8 @@ object MLInAction extends App {
   val housingStats = housingMat.computeColumnSummaryStatistics()
   val housingColSims = housingMat.columnSimilarities()
 
-  
-  
   MlUtility.printMat(MlUtility.toBreezeD(housingColSims))
   val housingCovar = housingMat.computeCovariance()
   MlUtility.printMat(MlUtility.toBreezeM(housingCovar))
-  
 
 }

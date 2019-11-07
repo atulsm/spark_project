@@ -29,7 +29,6 @@ object SparkLinearRegSGDHighOrder extends App {
       Vectors.dense(a.slice(0, a.length - 1)))
   })
 
-  
   val housingHP = housingData.map(v => LabeledPoint(v.label, addHighPols(v.features)))
 
   housingHP.first().features.size
@@ -45,12 +44,10 @@ object SparkLinearRegSGDHighOrder extends App {
 
   iterateLRwSGD(Array(200, 400), Array(0.4, 0.5, 0.6, 0.7, 0.9, 1.0, 1.1, 1.2, 1.3, 1.5), trainHPScaled, validHPScaled)
 
-  
-  
   //iterateLRwSGD(Array(200, 400, 800, 1000, 3000, 6000), Array(1.1), trainHPScaled, validHPScaled)
-  
+
   //iterateLRwSGD(Array(10000, 15000, 30000, 50000), Array(1.1), trainHPScaled, validHPScaled)
-  
+
   def iterateLRwSGD(iterNums: Array[Int], stepSizes: Array[Double], train: RDD[LabeledPoint], test: RDD[LabeledPoint]) = {
     for (numIter <- iterNums; step <- stepSizes) {
       val alg = new LinearRegressionWithSGD()
@@ -69,7 +66,7 @@ object SparkLinearRegSGDHighOrder extends App {
   }
   def addHighPols(v: Vector): Vector =
     {
-      Vectors.dense(v.toArray.flatMap(x => Array(x, x * x )))
+      Vectors.dense(v.toArray.flatMap(x => Array(x, x * x)))
     }
 
 }

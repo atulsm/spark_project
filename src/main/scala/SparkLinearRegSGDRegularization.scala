@@ -1,7 +1,5 @@
 
 
-
-
 import org.apache.spark.mllib.clustering.{ KMeans, KMeansModel }
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.linalg.Vector
@@ -51,8 +49,6 @@ object SparkLinearRegSGDRegulaization extends App {
 
   //val model_load = LinearRegressionModel.load(sc, "hdfs:///path/to/saved/model")
 
- 
-
   val housingHP = housingData.map(v => LabeledPoint(v.label, addHighPols(v.features)))
 
   housingHP.first().features.size
@@ -64,50 +60,44 @@ object SparkLinearRegSGDRegulaization extends App {
   val trainHPScaled = housingHPTrain.map(x => LabeledPoint(x.label, scalerHP.transform(x.features)))
   val validHPScaled = housingHPValid.map(x => LabeledPoint(x.label, scalerHP.transform(x.features)))
   trainHPScaled.cache()
-  validHPScaled.cache() 
-  
-  
-  //iterateRidge(Array(200, 400, 1000, 3000, 6000, 10000), Array(1.1), 0.01, trainHPScaled, validHPScaled)
-  
-  iterateLasso(Array(200, 400, 1000, 3000, 6000, 10000, 15000), Array(1.2), 0.01, trainHPScaled, validHPScaled)
-  
- 
+  validHPScaled.cache()
 
-  
+  //iterateRidge(Array(200, 400, 1000, 3000, 6000, 10000), Array(1.1), 0.01, trainHPScaled, validHPScaled)
+
+  iterateLasso(Array(200, 400, 1000, 3000, 6000, 10000, 15000), Array(1.2), 0.01, trainHPScaled, validHPScaled)
+
   def addHighPols(v: Vector): Vector =
     {
       Vectors.dense(v.toArray.flatMap(x => Array(x, x * x)))
     }
-  
-  def iterateRidge(iterNums:Array[Int], stepSizes:Array[Double], regParam:Double, train:RDD[LabeledPoint], test:RDD[LabeledPoint]) = {
-  import org.apache.spark.mllib.regression.RidgeRegressionWithSGD
-  for(numIter <- iterNums; step <- stepSizes)
-  {
-    val alg = new RidgeRegressionWithSGD()
-    alg.setIntercept(true)
-    alg.optimizer.setNumIterations(numIter).setRegParam(regParam).setStepSize(step)
-    val model = alg.run(train)
-    val rescaledPredicts = train.map(x => (model.predict(x.features), x.label))
-    val validPredicts = test.map(x => (model.predict(x.features), x.label))
-    val meanSquared = math.sqrt(rescaledPredicts.map({case(p,l) => math.pow(p-l,2)}).mean())
-    val meanSquaredValid = math.sqrt(validPredicts.map({case(p,l) => math.pow(p-l,2)}).mean())
-    println("%d, %5.3f -> %.4f, %.4f".format(numIter, step, meanSquared, meanSquaredValid))
+
+  def iterateRidge(iterNums: Array[Int], stepSizes: Array[Double], regParam: Double, train: RDD[LabeledPoint], test: RDD[LabeledPoint]) = {
+    import org.apache.spark.mllib.regression.RidgeRegressionWithSGD
+    for (numIter <- iterNums; step <- stepSizes) {
+      val alg = new RidgeRegressionWithSGD()
+      alg.setIntercept(true)
+      alg.optimizer.setNumIterations(numIter).setRegParam(regParam).setStepSize(step)
+      val model = alg.run(train)
+      val rescaledPredicts = train.map(x => (model.predict(x.features), x.label))
+      val validPredicts = test.map(x => (model.predict(x.features), x.label))
+      val meanSquared = math.sqrt(rescaledPredicts.map({ case (p, l) => math.pow(p - l, 2) }).mean())
+      val meanSquaredValid = math.sqrt(validPredicts.map({ case (p, l) => math.pow(p - l, 2) }).mean())
+      println("%d, %5.3f -> %.4f, %.4f".format(numIter, step, meanSquared, meanSquaredValid))
+    }
   }
-}
-def iterateLasso(iterNums:Array[Int], stepSizes:Array[Double], regParam:Double, train:RDD[LabeledPoint], test:RDD[LabeledPoint]) = {
-  import org.apache.spark.mllib.regression.LassoWithSGD
-  for(numIter <- iterNums; step <- stepSizes)
-  {
-    val alg = new LassoWithSGD()
-    alg.setIntercept(true).optimizer.setNumIterations(numIter).setStepSize(step).setRegParam(regParam)
-    val model = alg.run(train)
-    val rescaledPredicts = train.map(x => (model.predict(x.features), x.label))
-    val validPredicts = test.map(x => (model.predict(x.features), x.label))
-    val meanSquared = math.sqrt(rescaledPredicts.map({case(p,l) => math.pow(p-l,2)}).mean())
-    val meanSquaredValid = math.sqrt(validPredicts.map({case(p,l) => math.pow(p-l,2)}).mean())
-    println("%d, %5.3f -> %.4f, %.4f".format(numIter, step, meanSquared, meanSquaredValid))
-    println("\tweights: "+model.weights)
+  def iterateLasso(iterNums: Array[Int], stepSizes: Array[Double], regParam: Double, train: RDD[LabeledPoint], test: RDD[LabeledPoint]) = {
+    import org.apache.spark.mllib.regression.LassoWithSGD
+    for (numIter <- iterNums; step <- stepSizes) {
+      val alg = new LassoWithSGD()
+      alg.setIntercept(true).optimizer.setNumIterations(numIter).setStepSize(step).setRegParam(regParam)
+      val model = alg.run(train)
+      val rescaledPredicts = train.map(x => (model.predict(x.features), x.label))
+      val validPredicts = test.map(x => (model.predict(x.features), x.label))
+      val meanSquared = math.sqrt(rescaledPredicts.map({ case (p, l) => math.pow(p - l, 2) }).mean())
+      val meanSquaredValid = math.sqrt(validPredicts.map({ case (p, l) => math.pow(p - l, 2) }).mean())
+      println("%d, %5.3f -> %.4f, %.4f".format(numIter, step, meanSquared, meanSquaredValid))
+      println("\tweights: " + model.weights)
+    }
   }
-}
 
 }

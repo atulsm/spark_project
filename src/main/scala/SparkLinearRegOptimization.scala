@@ -1,9 +1,5 @@
 
 
-
-
-
-
 import org.apache.spark.mllib.clustering.{ KMeans, KMeansModel }
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.linalg.Vector
@@ -53,8 +49,6 @@ object SparkLinearRegSGDOptimization extends App {
 
   //val model_load = LinearRegressionModel.load(sc, "hdfs:///path/to/saved/model")
 
- 
-
   val housingHP = housingData.map(v => LabeledPoint(v.label, addHighPols(v.features)))
 
   housingHP.first().features.size
@@ -66,51 +60,46 @@ object SparkLinearRegSGDOptimization extends App {
   val trainHPScaled = housingHPTrain.map(x => LabeledPoint(x.label, scalerHP.transform(x.features)))
   val validHPScaled = housingHPValid.map(x => LabeledPoint(x.label, scalerHP.transform(x.features)))
   trainHPScaled.cache()
-  validHPScaled.cache() 
-  
-  
+  validHPScaled.cache()
+
   //iterateLRwSGDBatch(Array(400, 1000), Array(0.05, 0.09, 0.1, 0.15, 0.2, 0.3, 0.35, 0.4, 0.5, 1), Array(0.01, 0.1), trainHPScaled, validHPScaled)
 
   iterateLRwSGDBatch(Array(400, 1000, 2000, 3000, 5000, 10000), Array(0.4), Array(0.1, 0.2, 0.4, 0.5, 0.6, 0.8), trainHPScaled, validHPScaled)
-  
+
   def addHighPols(v: Vector): Vector =
     {
       Vectors.dense(v.toArray.flatMap(x => Array(x, x * x)))
     }
-  
-  def iterateRidge(iterNums:Array[Int], stepSizes:Array[Double], regParam:Double, train:RDD[LabeledPoint], test:RDD[LabeledPoint]) = {
-  import org.apache.spark.mllib.regression.RidgeRegressionWithSGD
-  for(numIter <- iterNums; step <- stepSizes)
-  {
-    val alg = new RidgeRegressionWithSGD()
-    alg.setIntercept(true)
-    alg.optimizer.setNumIterations(numIter).setRegParam(regParam).setStepSize(step)
-    val model = alg.run(train)
-    val rescaledPredicts = train.map(x => (model.predict(x.features), x.label))
-    val validPredicts = test.map(x => (model.predict(x.features), x.label))
-    val meanSquared = math.sqrt(rescaledPredicts.map({case(p,l) => math.pow(p-l,2)}).mean())
-    val meanSquaredValid = math.sqrt(validPredicts.map({case(p,l) => math.pow(p-l,2)}).mean())
-    println("%d, %5.3f -> %.4f, %.4f".format(numIter, step, meanSquared, meanSquaredValid))
-  }
-}
 
-  
-  def iterateLRwSGDBatch(iterNums:Array[Int], stepSizes:Array[Double], fractions:Array[Double], train:RDD[LabeledPoint], test:RDD[LabeledPoint]) = {
-  for(numIter <- iterNums; step <- stepSizes; miniBFraction <- fractions)
-  {
-    val alg = new LinearRegressionWithSGD()
-    alg.setIntercept(true).optimizer.setNumIterations(numIter).setStepSize(step)
-    alg.optimizer.setMiniBatchFraction(miniBFraction)
-    val model = alg.run(train)
-    val rescaledPredicts = train.map(x => (model.predict(x.features), x.label))
-    val validPredicts = test.map(x => (model.predict(x.features), x.label))
-    val meanSquared = math.sqrt(rescaledPredicts.map({case(p,l) => math.pow(p-l,2)}).mean())
-    val meanSquaredValid = math.sqrt(validPredicts.map({case(p,l) => math.pow(p-l,2)}).mean())
-    println("%d, %5.3f %5.3f -> %.4f, %.4f".format(numIter, step, miniBFraction, meanSquared, meanSquaredValid))
+  def iterateRidge(iterNums: Array[Int], stepSizes: Array[Double], regParam: Double, train: RDD[LabeledPoint], test: RDD[LabeledPoint]) = {
+    import org.apache.spark.mllib.regression.RidgeRegressionWithSGD
+    for (numIter <- iterNums; step <- stepSizes) {
+      val alg = new RidgeRegressionWithSGD()
+      alg.setIntercept(true)
+      alg.optimizer.setNumIterations(numIter).setRegParam(regParam).setStepSize(step)
+      val model = alg.run(train)
+      val rescaledPredicts = train.map(x => (model.predict(x.features), x.label))
+      val validPredicts = test.map(x => (model.predict(x.features), x.label))
+      val meanSquared = math.sqrt(rescaledPredicts.map({ case (p, l) => math.pow(p - l, 2) }).mean())
+      val meanSquaredValid = math.sqrt(validPredicts.map({ case (p, l) => math.pow(p - l, 2) }).mean())
+      println("%d, %5.3f -> %.4f, %.4f".format(numIter, step, meanSquared, meanSquaredValid))
+    }
   }
-  
-  
-}
-  
+
+  def iterateLRwSGDBatch(iterNums: Array[Int], stepSizes: Array[Double], fractions: Array[Double], train: RDD[LabeledPoint], test: RDD[LabeledPoint]) = {
+    for (numIter <- iterNums; step <- stepSizes; miniBFraction <- fractions) {
+      val alg = new LinearRegressionWithSGD()
+      alg.setIntercept(true).optimizer.setNumIterations(numIter).setStepSize(step)
+      alg.optimizer.setMiniBatchFraction(miniBFraction)
+      val model = alg.run(train)
+      val rescaledPredicts = train.map(x => (model.predict(x.features), x.label))
+      val validPredicts = test.map(x => (model.predict(x.features), x.label))
+      val meanSquared = math.sqrt(rescaledPredicts.map({ case (p, l) => math.pow(p - l, 2) }).mean())
+      val meanSquaredValid = math.sqrt(validPredicts.map({ case (p, l) => math.pow(p - l, 2) }).mean())
+      println("%d, %5.3f %5.3f -> %.4f, %.4f".format(numIter, step, miniBFraction, meanSquared, meanSquaredValid))
+    }
+
+  }
+
 }
 

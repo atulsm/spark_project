@@ -9,7 +9,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.rdd._
-import org.apache.spark.mllib.recommendation.{ALS, Rating, MatrixFactorizationModel}
+import org.apache.spark.mllib.recommendation.{ ALS, Rating, MatrixFactorizationModel }
 
 object MovieLensALS {
 
@@ -18,11 +18,11 @@ object MovieLensALS {
     Logger.getLogger("org.apache.spark").setLevel(Level.WARN)
     Logger.getLogger("org.eclipse.jetty.server").setLevel(Level.OFF)
 
-//    if (args.length != 2) {
-//      println("Usage: /path/to/spark/bin/spark-submit --driver-memory 2g --class MovieLensALS " +
-//        "target/scala-*/movielens-als-ssembly-*.jar movieLensHomeDir personalRatingsFile")
-//      sys.exit(1)
-//    }
+    //    if (args.length != 2) {
+    //      println("Usage: /path/to/spark/bin/spark-submit --driver-memory 2g --class MovieLensALS " +
+    //        "target/scala-*/movielens-als-ssembly-*.jar movieLensHomeDir personalRatingsFile")
+    //      sys.exit(1)
+    //    }
 
     // set up environment
 

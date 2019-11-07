@@ -30,8 +30,8 @@ object GraphXExample extends App {
 
   println(subex_graph.edges.filter { e => e.srcId > e.dstId }.count)
 
-  val path: RDD[String] = subex_graph.triplets.map(triplet => triplet.srcAttr._1 + " playing role of "+ triplet.srcAttr._2+
-     " is the " + triplet.attr + "of " + triplet.dstAttr._1+" playing role "+triplet.dstAttr._2)
+  val path: RDD[String] = subex_graph.triplets.map(triplet => triplet.srcAttr._1 + " playing role of " + triplet.srcAttr._2 +
+    " is the " + triplet.attr + "of " + triplet.dstAttr._1 + " playing role " + triplet.dstAttr._2)
 
   path.collect.foreach(println)
   //Thread.sleep(2222222)

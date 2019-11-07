@@ -25,7 +25,5 @@ object SQLExample2 extends App {
 
   customer_DF.createOrReplaceTempView("subex_customers_new")
   customer_DF.select("name", "city").show
-     
 
-  
 }

@@ -64,14 +64,10 @@ object SparkLinearRegSGDOptimizationLBFGS extends App {
 
   iterateLBFGS(Array(0.005, 0.007, 0.01, 0.02, 0.03, 0.05, 0.1), 10, 1e-5, trainHPScaled, validHPScaled)
 
-  
-  
   def addHighPols(v: Vector): Vector =
     {
       Vectors.dense(v.toArray.flatMap(x => Array(x, x * x)))
     }
-
- 
 
   def iterateLBFGS(regParams: Array[Double], numCorrections: Int, tolerance: Double, train: RDD[LabeledPoint], test: RDD[LabeledPoint]) = {
     import org.apache.spark.mllib.optimization.LeastSquaresGradient
@@ -103,6 +99,4 @@ object SparkLinearRegSGDOptimizationLBFGS extends App {
   }
 
 }
-  
-
 

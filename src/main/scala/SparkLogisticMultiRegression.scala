@@ -78,15 +78,15 @@ object SparkLogisticMultiRegression extends App {
 
   //penPreds.collect.foreach(println)
   import org.apache.spark.mllib.evaluation.MulticlassMetrics
-  
+
   val penmm = new MulticlassMetrics(penPreds)
   //println(penmm.precision)
   //0.9018214127054642
-   println(penmm.precision(3))
+  println(penmm.precision(3))
   //0.9026548672566371
   println(penmm.recall(3))
   //0.9855072463768116
-   println(penmm.fMeasure(3))
+  println(penmm.fMeasure(3))
   //0.9422632794457274
   println(penmm.confusionMatrix)
 

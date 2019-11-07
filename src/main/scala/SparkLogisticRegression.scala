@@ -54,44 +54,44 @@ object SparkLogisticRegression extends App {
   //dfraw.show()
 
   dfraw.groupBy(dfraw("workclass")).count().rdd.foreach(println)
-//  //Missing data imputation
+  //  //Missing data imputation
   val dfrawrp = dfraw.na.replace(Array("workclass"), Map("?" -> "Private"))
   val dfrawrpl = dfrawrp.na.replace(Array("occupation"), Map("?" -> "Prof-specialty"))
   val dfrawnona = dfrawrpl.na.replace(Array("native_country"), Map("?" -> "United-States"))
-//
+  //
   val dfnumeric = indexStringColumns(dfrawnona, Array("workclass", "education", "marital_status", "occupation", "relationship", "race", "sex", "native_country", "income"))
-//
+  //
   val dfhot = oneHotEncodeColumns(dfnumeric, Array("workclass", "education", "marital_status", "occupation", "relationship", "race", "native_country"))
 
   //dfhot.show
-  
+
   val va = new VectorAssembler().setOutputCol("features")
   va.setInputCols(dfhot.columns.diff(Array("income")))
   val lpoints = va.transform(dfhot).select("features", "income").withColumnRenamed("income", "label")
-//
+  //
   val splits = lpoints.randomSplit(Array(0.8, 0.2))
   val adulttrain = splits(0).cache()
   val adultvalid = splits(1).cache()
-//
+  //
   val lr = new LogisticRegression
- // lr.setThreshold(0.4)
+  // lr.setThreshold(0.4)
   lr.setRegParam(0.01).setMaxIter(1000).setFitIntercept(true)
   //val lrmodel = lr.fit(adulttrain)
-//
+  //
   val lrmodel = lr.fit(adulttrain, ParamMap(lr.regParam -> 0.01, lr.maxIter -> 500, lr.fitIntercept -> true))
-//
-//  //lrmodel.weights
-//  lrmodel.intercept
-//
+  //
+  //  //lrmodel.weights
+  //  lrmodel.intercept
+  //
   val validpredicts = lrmodel.transform(adultvalid)
-//
+  //
   val bceval = new BinaryClassificationEvaluator()
   bceval.evaluate(validpredicts)
   bceval.getMetricName
 
   bceval.setMetricName("areaUnderPR")
   println(bceval.evaluate(validpredicts))
-//
+  //
   computePRCurve(adulttrain, adultvalid, lrmodel)
   computeROCCurve(adulttrain, adultvalid, lrmodel)
 
@@ -117,7 +117,7 @@ object SparkLogisticRegression extends App {
         val validPredRdd = validpredicts.rdd.map(row => (row.getDouble(4), row.getDouble(1)))
         val bcm = new BinaryClassificationMetrics(validPredRdd)
         val pr = bcm.pr.collect()(1)
-       // println("%.1f: R=%f, P=%f".format(thr, pr._1, pr._2))
+        // println("%.1f: R=%f, P=%f".format(thr, pr._1, pr._2))
       }
     }
 
@@ -133,7 +133,7 @@ object SparkLogisticRegression extends App {
         val validPredRdd = validpredicts.rdd.map(row => (row.getDouble(4), row.getDouble(1)))
         val bcm = new BinaryClassificationMetrics(validPredRdd)
         val pr = bcm.roc.collect()(1)
-       // println("%.1f: FPR=%f, TPR=%f".format(thr, pr._1, pr._2))
+        // println("%.1f: FPR=%f, TPR=%f".format(thr, pr._1, pr._2))
       }
     }
 

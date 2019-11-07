@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 import java.util.Properties
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel
@@ -43,20 +42,17 @@ object SQLDataSourceExample {
   private def runBasicDataSourceExample(spark: SparkSession): Unit = {
     // $example on:generic_load_save_functions$
     val usersDF = spark.read.load("src/main/resources/users.parquet")
-    
-   // usersDF.show()
-    
-   // usersDF.select("name", "favorite_color").write.save("namesAndFavColors.parquet")
-    
-    
-    
+
+    // usersDF.show()
+
+    // usersDF.select("name", "favorite_color").write.save("namesAndFavColors.parquet")
+
     // $example off:generic_load_save_functions$
     // $example on:manual_load_options$
     //val peopleDF = spark.read.format("json").load("src/main/resources/people.json")
-    
+
     //peopleDF.select("name", "age").write.format("parquet").save("namesAndAges.parquet")
-    
-    
+
     // $example off:manual_load_options$
     // $example on:manual_load_options_csv$
     val peopleDFCsv = spark.read.format("csv")
@@ -64,15 +60,15 @@ object SQLDataSourceExample {
       .option("inferSchema", "true")
       .option("header", "true")
       .load("src/main/resources/people.csv")
-      
-      peopleDFCsv.show
+
+    peopleDFCsv.show
     // $example off:manual_load_options_csv$
 
     // $example on:direct_sql$
     //val sqlDF = spark.sql("SELECT * FROM parquet.`examples/src/main/resources/users.parquet`")
     // $example off:direct_sql$
     // $example on:write_sorting_and_bucketing$
-   // peopleDF.write.bucketBy(42, "name").sortBy("age").saveAsTable("people_bucketed")
+    // peopleDF.write.bucketBy(42, "name").sortBy("age").saveAsTable("people_bucketed")
     // $example off:write_sorting_and_bucketing$
     // $example on:write_partitioning$
     //usersDF.write.partitionBy("favorite_color").format("parquet").save("namesPartByColor.parquet")

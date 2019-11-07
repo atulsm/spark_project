@@ -6,10 +6,10 @@ import org.apache.spark.graphx._
 object GraphXExample1 {
 
   def main(args: Array[String]): Unit = {
-    
-    val conf = new SparkConf().setAppName("GraphExample").setMaster("local[2]") 
+
+    val conf = new SparkConf().setAppName("GraphExample").setMaster("local[2]")
     val sc = new SparkContext(conf)
-    
+
     val bigdataMembers: RDD[(VertexId, (String, String))] =
       sc.parallelize(Array((5L, ("Anand", "Architect")), (3L, ("Hari", "Manager")),
         (4L, ("Sandeep", "developer")), (6L, ("Mukesh", "SQL expert"))))

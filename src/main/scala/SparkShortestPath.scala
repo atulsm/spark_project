@@ -26,26 +26,24 @@ object SparkShortestPath extends App {
 
   val articles = sc.textFile("C:/BigData/Apache Spark/Spark-in-action/first-edition-master/ch09/articles.tsv", 6).
     filter(line => line.trim() != "" && !line.startsWith("#")).zipWithIndex()
-    
-      articles.filter(x => x._1 == "Rainbow" || x._1 == "14th_century")
+
+  articles.filter(x => x._1 == "Rainbow" || x._1 == "14th_century")
     .collect()
     .foreach(println)
-    
-    
-    articles.count()
-    
+
+  articles.count()
+
   val links = sc.textFile("C:/BigData/Apache Spark/Spark-in-action/first-edition-master/ch09/links.tsv", 6)
     .filter(line => line.trim() != "" && !line.startsWith("#"))
-    
-    
+
   val linkIndexes = links.map(x => { val spl = x.split("\t"); (spl(0), spl(1)) }).
     join(articles).map(x => x._2).join(articles).map(x => x._2)
-    
+
   val wikigraph = Graph.fromEdgeTuples(linkIndexes, 0)
   wikigraph.vertices.count()
-//
-  
-//  //Long = 4604
+  //
+
+  //  //Long = 4604
   linkIndexes.map(x => x._1).union(linkIndexes.map(x => x._2)).distinct().count()
   //Long = 4592
   //finding the articles that have no links
@@ -54,22 +52,21 @@ object SparkShortestPath extends App {
     .distinct().map(x => (x, x))
   articles.map(x => (x._2, x._1)).leftOuterJoin(distinctLinkIndexes).filter(x => x._2._2.isEmpty).collect()
 
-
-//
-//  //shortest path
-//
+  //
+  //  //shortest path
+  //
   val shortest = ShortestPaths.run(wikigraph, Seq(10))
   shortest.vertices.filter(x => x._1 == 3425).collect.foreach(println)
 
   // page rank
 
-    val ranked = wikigraph.pageRank(0.001)
-    val ordering = new Ordering[Tuple2[VertexId, Double]] {
-      def compare(x: Tuple2[VertexId, Double], y: Tuple2[VertexId, Double]): Int = x._2.compareTo(y._2)
-    }
-    val top10 = ranked.vertices.top(10)(ordering)
-    sc.parallelize(top10).join(articles.map(_.swap))
-      .collect.sortWith((x, y) => x._2._1 > y._2._1).foreach(println)
+  val ranked = wikigraph.pageRank(0.001)
+  val ordering = new Ordering[Tuple2[VertexId, Double]] {
+    def compare(x: Tuple2[VertexId, Double], y: Tuple2[VertexId, Double]): Int = x._2.compareTo(y._2)
+  }
+  val top10 = ranked.vertices.top(10)(ordering)
+  sc.parallelize(top10).join(articles.map(_.swap))
+    .collect.sortWith((x, y) => x._2._1 > y._2._1).foreach(println)
 
   // connected components 
 

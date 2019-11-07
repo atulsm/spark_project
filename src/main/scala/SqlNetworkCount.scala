@@ -2,7 +2,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel
-import org.apache.spark.streaming.{Seconds, StreamingContext, Time}
+import org.apache.spark.streaming.{ Seconds, StreamingContext, Time }
 
 /**
  * Use DataFrames and SQL to count words in UTF8 encoded, '\n' delimited text received from the
@@ -61,15 +61,13 @@ object SqlNetworkWordCount {
   }
 }
 
-
 /** Case class for converting RDD to DataFrame */
 case class Record(word: String)
-
 
 /** Lazily instantiated singleton instance of SparkSession */
 object SparkSessionSingleton {
 
-  @transient  private var instance: SparkSession = _
+  @transient private var instance: SparkSession = _
 
   def getInstance(sparkConf: SparkConf): SparkSession = {
     if (instance == null) {

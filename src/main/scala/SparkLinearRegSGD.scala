@@ -51,8 +51,6 @@ object SparkLinearRegSGD extends App {
 
   iterateLRwSGD(Array(200, 400, 600), Array(0.05, 0.1, 0.5, 1, 1.5, 2, 3), trainScaled, validScaled)
 
-  
-  
   def iterateLRwSGD(iterNums: Array[Int], stepSizes: Array[Double], train: RDD[LabeledPoint], test: RDD[LabeledPoint]) = {
     for (numIter <- iterNums; step <- stepSizes) {
       val alg = new LinearRegressionWithSGD()
@@ -69,6 +67,5 @@ object SparkLinearRegSGD extends App {
     }
 
   }
- 
 
 }

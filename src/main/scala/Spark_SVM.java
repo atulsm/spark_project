@@ -30,59 +30,57 @@ public class Spark_SVM {
 		// RDD training = MLUtils.loadLabeledData(sc, args[0]);
 		// RDD test = MLUtils.loadLabeledData(sc, args[1]); // test set
 
-		JavaRDD training = sc.textFile(args[0]).cache()
-				.map(new Function<String, LabeledPoint>() {
+		JavaRDD training = sc.textFile(args[0]).cache().map(new Function<String, LabeledPoint>() {
 
-					@Override
-					public LabeledPoint call(String v1) throws Exception {
-						
-						String[] tokens = v1.split(",");
-//						double label = Double.parseDouble(v1.substring(0,
-//								v1.indexOf(",")));
-						
-						double label = Double.parseDouble(tokens[1]);
-//						String featureString[] = v1
-//								.substring(v1.indexOf(",") + 1).trim()
-//								.split(" ");
-						
-						String featureString[] = tokens[2].trim().split(" ");
-						double[] v = new double[featureString.length];
-						int i = 0;
-						for (String s : featureString) {
-							if (s.trim().equals(""))
-								continue;
-							v[i++] = Double.parseDouble(s.trim());
-						}
-						return new LabeledPoint(label, Vectors.dense(v));
-					}
+			@Override
+			public LabeledPoint call(String v1) throws Exception {
 
-				});
+				String[] tokens = v1.split(",");
+				// double label = Double.parseDouble(v1.substring(0,
+				// v1.indexOf(",")));
+
+				double label = Double.parseDouble(tokens[1]);
+				// String featureString[] = v1
+				// .substring(v1.indexOf(",") + 1).trim()
+				// .split(" ");
+
+				String featureString[] = tokens[2].trim().split(" ");
+				double[] v = new double[featureString.length];
+				int i = 0;
+				for (String s : featureString) {
+					if (s.trim().equals(""))
+						continue;
+					v[i++] = Double.parseDouble(s.trim());
+				}
+				return new LabeledPoint(label, Vectors.dense(v));
+			}
+
+		});
 		System.out.println(training.count());
-		JavaRDD test = sc.textFile(args[1]).cache()
-				.map(new Function<String, LabeledPoint>() {
+		JavaRDD test = sc.textFile(args[1]).cache().map(new Function<String, LabeledPoint>() {
 
-					@Override
-					public LabeledPoint call(String v1) throws Exception {
-						String[] tokens = v1.split(",");
-//						double label = Double.parseDouble(v1.substring(0,
-//								v1.indexOf(",")));
-						
-						double label = Double.parseDouble(tokens[1]);
-//						String featureString[] = v1
-//								.substring(v1.indexOf(",") + 1).trim()
-//								.split(" ");
-						String featureString[] = tokens[2].trim().split(" ");
-						double[] v = new double[featureString.length];
-						int i = 0;
-						for (String s : featureString) {
-							if (s.trim().equals(""))
-								continue;
-							v[i++] = Double.parseDouble(s.trim());
-						}
-						return new LabeledPoint(label, Vectors.dense(v));
-					}
+			@Override
+			public LabeledPoint call(String v1) throws Exception {
+				String[] tokens = v1.split(",");
+				// double label = Double.parseDouble(v1.substring(0,
+				// v1.indexOf(",")));
 
-				});
+				double label = Double.parseDouble(tokens[1]);
+				// String featureString[] = v1
+				// .substring(v1.indexOf(",") + 1).trim()
+				// .split(" ");
+				String featureString[] = tokens[2].trim().split(" ");
+				double[] v = new double[featureString.length];
+				int i = 0;
+				for (String s : featureString) {
+					if (s.trim().equals(""))
+						continue;
+					v[i++] = Double.parseDouble(s.trim());
+				}
+				return new LabeledPoint(label, Vectors.dense(v));
+			}
+
+		});
 		System.out.println(test.count());
 		final NaiveBayesModel model = NaiveBayes.train(training.rdd(), 1.0);
 
@@ -90,45 +88,38 @@ public class Spark_SVM {
 				.mapToPair(new PairFunction<LabeledPoint, Double, Double>() {
 					@Override
 					public Tuple2<Double, Double> call(LabeledPoint p) {
-						return new Tuple2<Double, Double>(model.predict(p
-								.features()), p.label());
+						return new Tuple2<Double, Double>(model.predict(p.features()), p.label());
 					}
 				});
-		double accuracy = 1.0
-				* predictionAndLabel.filter(
-						new Function<Tuple2<Double, Double>, Boolean>() {
-							@Override
-							public Boolean call(Tuple2<Double, Double> pl) {
-								// System.out.println(pl._1() + " -- " +
-								// pl._2());
-								return pl._1().intValue() == pl._2().intValue();
-							}
-						}).count() / (double) test.count();
+		double accuracy = 1.0 * predictionAndLabel.filter(new Function<Tuple2<Double, Double>, Boolean>() {
+			@Override
+			public Boolean call(Tuple2<Double, Double> pl) {
+				// System.out.println(pl._1() + " -- " +
+				// pl._2());
+				return pl._1().intValue() == pl._2().intValue();
+			}
+		}).count() / (double) test.count();
 		System.out.println("navie bayes accuracy : " + accuracy);
 
-		final SVMModel svmModel = SVMWithSGD.train(training.rdd(),
-				Integer.parseInt(args[2]));
+		final SVMModel svmModel = SVMWithSGD.train(training.rdd(), Integer.parseInt(args[2]));
 
 		JavaPairRDD<Double, Double> predictionAndLabelSVM = test
 				.mapToPair(new PairFunction<LabeledPoint, Double, Double>() {
 					@Override
 					public Tuple2<Double, Double> call(LabeledPoint p) {
-						return new Tuple2<Double, Double>(svmModel.predict(p
-								.features()), p.label());
+						return new Tuple2<Double, Double>(svmModel.predict(p.features()), p.label());
 					}
 				});
-		
-		System.out.println("result:::"+predictionAndLabelSVM.collect().toString());
-		double accuracySVM = 1.0
-				* predictionAndLabelSVM.filter(
-						new Function<Tuple2<Double, Double>, Boolean>() {
-							@Override
-							public Boolean call(Tuple2<Double, Double> pl) {
-								// System.out.println(pl._1() + " -- " +
-								// pl._2());
-								return pl._1().intValue() == pl._2().intValue();
-							}
-						}).count() / (double) test.count();
+
+		System.out.println("result:::" + predictionAndLabelSVM.collect().toString());
+		double accuracySVM = 1.0 * predictionAndLabelSVM.filter(new Function<Tuple2<Double, Double>, Boolean>() {
+			@Override
+			public Boolean call(Tuple2<Double, Double> pl) {
+				// System.out.println(pl._1() + " -- " +
+				// pl._2());
+				return pl._1().intValue() == pl._2().intValue();
+			}
+		}).count() / (double) test.count();
 		System.out.println("svm accuracy : " + accuracySVM);
 
 	}

@@ -2,10 +2,9 @@ import java.util.Properties
 
 import org.apache.spark.streaming.StreamingContext._
 import org.apache.spark.streaming.twitter._
-import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.apache.spark.streaming.{ Seconds, StreamingContext }
 import twitter4j.TwitterFactory
 import twitter4j.conf.ConfigurationBuilder
-
 
 /**
  * Created by madhu on 3/7/14.
@@ -27,9 +26,8 @@ object TwitterStream {
     val twitter = tf.getInstance()
     val auth = twitter.getAuthorization
 
-
     val filters = Array(hashTag)
-    val twitterStream = TwitterUtils.createStream(ssc,Some(auth),filters)
+    val twitterStream = TwitterUtils.createStream(ssc, Some(auth), filters)
 
     //caching enabled
 
@@ -43,8 +41,8 @@ object TwitterStream {
     wordCounts.print()
     //wordCounts.count()
 
-    ssc.start()             // Start the computation
-    ssc.awaitTermination()  // Wait for the computation to terminate
+    ssc.start() // Start the computation
+    ssc.awaitTermination() // Wait for the computation to terminate
   }
 
 }

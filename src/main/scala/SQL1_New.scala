@@ -15,12 +15,12 @@ object SQL1_New {
     df.printSchema()
     df.select("name").show()
     df.select($"name", $"id" + 1).show()
-    val filtdata= df.filter($"id" > 2)
+    val filtdata = df.filter($"id" > 2)
 
     df.createOrReplaceTempView("people")
-    
+
     filtdata.createOrReplaceTempView("people1")
-    
+
     val sqlDF1 = spark.sql("SELECT * FROM people1")
     sqlDF1.show()
 
