@@ -13,7 +13,7 @@ object SqlEx2 {
   def main(args: Array[String]) {
     // val logFile = "file:////usr/hdp/2.4.0.0-169/spark/README.md" // Should be some file on your system set("spark.ui.port", "44040" ).
 
-    val logFile = "C:\\BigData\\customers.txt"
+    val logFile = "/tmp/Customers.csv"
 
     val conf = new SparkConf().setAppName("SqlExample1").setMaster("local[2]")
     val sc1 = new SparkContext(conf)

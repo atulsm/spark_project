@@ -1,3 +1,6 @@
 target/
 bin/
 project/
+metastore_db/
+spark-warehouse/
+
