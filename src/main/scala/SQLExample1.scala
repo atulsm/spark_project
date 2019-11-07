@@ -11,7 +11,7 @@ object SQLExample1 extends App {
     val rootLogger = Logger.getRootLogger()
     rootLogger.setLevel(Level.ERROR)
   
-   val logFile= "C:\\BigData\\Apache Spark\\Customers.csv"
+   val logFile= "/tmp/Customers.csv"
     
     val conf = new SparkConf().setAppName("SQL Application").setMaster("local[2]") 
     val sc1 = new SparkContext(conf)
