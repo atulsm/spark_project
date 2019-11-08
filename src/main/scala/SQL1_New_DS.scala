@@ -24,8 +24,8 @@ object SQL1_New_DS {
     val peopleDS = spark.read.json(path).as[TenisPlayer]
     
     //write to local table
-    //peopleDS.write.partitionBy("Name").bucketBy(4, "id").saveAsTable("RogerTable");
-    //peopleDS.show()
+    peopleDS.write.partitionBy("Name").bucketBy(4, "id").saveAsTable("RogerTable");
+    peopleDS.show()
     
     // Displays the content of the DataFrame to stdout
     spark.sql("select * from PARQUET.`spark-warehouse/rogertable/Name=Rafael`").show

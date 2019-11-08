@@ -40,7 +40,7 @@ object SparkKafkaExample {
 
       val sparkConf = new SparkConf().setAppName("KafkaHBaseWordCount").setMaster("local[2]")
       val ssc = new StreamingContext(sparkConf, Seconds(1))
-      ssc.checkpoint("/checkpoints2") // checkpointing dir
+      ssc.checkpoint("checkpoints2") // checkpointing dir
       //ssc.checkpoint("hdfs://checkpoints")  // dir in hdfs for prod
 
       val kafkaConf = Map("metadata.broker.list" -> broker,
